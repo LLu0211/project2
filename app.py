@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly
 import plotly.graph_objects as go
 
 theses = pd.read_csv("THESES-TOTAL.csv")
