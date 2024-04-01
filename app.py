@@ -5,15 +5,11 @@ import plotly.graph_objects as go
 
 theses = pd.read_csv("THESES-TOTAL.csv")
 
-theses.head(5)
-
 maitrises = theses.query("type == 'maîtrise'")
 
 medianesMaitrisesUniv = maitrises.groupby("universite")["nbPages"].median().sort_values(ascending=False)
-medianesMaitrisesUniv
 
 medianesMaitrisesDiscipline = maitrises.groupby("discipline")["nbPages"].median().sort_values(ascending=False)
-medianesMaitrisesDiscipline
 
 # Manually update the values in the grandeDiscipline column
 theses['grandeDiscipline'] = theses['grandeDiscipline'].str.replace('1. Sciences exactes et naturelles', 'Sciences exactes et naturelles')
