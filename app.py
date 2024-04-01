@@ -20,77 +20,40 @@ theses['grandeDiscipline'] = theses['grandeDiscipline'].str.replace('5. Sciences
 theses['grandeDiscipline'] = theses['grandeDiscipline'].str.replace('6. Sciences humaines', 'Sciences humaines')
 theses['grandeDiscipline'] = theses['grandeDiscipline'].str.replace('7. Programme personnalisé', 'Programme personnalisé')
 
+selected_type = st.sidebar.multiselect("Select type:", ["Maîtrise", "Doctorat"], default=["Doctorat"])
+selected_grande_discipline = st.sidebar.selectbox("Select a grande discipline:", ["All Disciplines"] + list(theses['grandeDiscipline'].unique()), index=0)
 
 # Define your functions for updating the plots
 def update_box_plot_by_university(selected_type):
-    # Ensure that 'selected_type' is a list even if it contains only one element
-    if not isinstance(selected_type, list):
-        selected_type = [selected_type]
-
-    # Filter data based on selected type
     filtered_df = theses[theses['type'].isin(selected_type)]
-
-    # Check if the filtered dataframe is empty
-    if filtered_df.empty:
-        st.error('No data found for the selected type(s): {}'.format(selected_type))
-        return go.Figure()
-
-    # Calculate median nbPages for each university
     universite_medians = filtered_df.groupby('universite')['nbPages'].median().sort_values(ascending=True)
-
-    # Check if after grouping the dataframe is empty
-    if universite_medians.empty:
-        st.error('No median page numbers found for the selected type(s): {}'.format(selected_type))
-        return go.Figure()
-
-    # Generate an array of colors for the gradient
-    base_hue = 240  # Modify as needed for the correct color
+    base_hue = 240  
     base_saturation = 100
     min_lightness = 10
     max_lightness = 30
     colors = [f'hsl({base_hue}, {base_saturation}%, {l}%)' for l in np.linspace(max_lightness, min_lightness, len(universite_medians))]
-
-    # Create the box plot data, sorted by median nbPages
-    data1 = []
-    for i, universite in enumerate(universite_medians.index):
-        university_df = filtered_df[filtered_df['universite'] == universite]
-        if not university_df.empty:
-            box = go.Box(
-                y=university_df['nbPages'],
-                name=universite,
-                marker_color=colors[i],
-                boxmean='sd'  # Represents the standard deviation
-            )
-            data1.append(box)
-        else:
-            st.error(f'No data found for university: {universite}')
-
-    # If no box plots were added, return an empty figure
-    if not data1:
-        st.error('No data available to plot.')
-        return go.Figure()
-
-    # Create the figure with the data
+    data1 = [
+        go.Box(
+            x=filtered_df[filtered_df['universite'] == universite]['nbPages'],
+            name=universite,
+            marker_color=colors[i],
+            showlegend=False
+        )
+        for i, universite in enumerate(universite_medians.index)
+    ]
     fig1 = go.Figure(data=data1)
-
-    # Format the layout
     fig1.update_layout(
         yaxis=dict(
-            title="Nombre de pages"
-        ),
-        xaxis=dict(
             categoryorder='array',
-            categoryarray=[univ for univ in universite_medians.index],
+            categoryarray=universite_medians.index,
             title="Université"
         ),
+        xaxis=dict(title="Distribution du nombre de pages", zeroline=False, gridcolor='white'),
         plot_bgcolor='lightblue',
         font=dict(size=12),
         height=600
     )
-
-    # Debug: Display the figure's data in the Streamlit app for verification
-    st.write(fig1)
-
+    fig1.update_xaxes(range=[0, 650], showgrid=True, gridwidth=1, gridcolor='white')
     return fig1
 
 def update_box_plot_by_discipline(selected_type, selected_grande_discipline):
