@@ -97,8 +97,6 @@ def main():
     
     # Add widgets to the sidebar
     st.sidebar.title("Select Options")
-    selected_type = st.sidebar.multiselect("Select type:", ["Maîtrise", "Doctorat"], default=["Doctorat"])
-    selected_grande_discipline = st.sidebar.selectbox("Select a grande discipline:", ["All Disciplines"] + list(theses['grandeDiscipline'].unique()), index=0)
 
     # Update box plot by university
     st.subheader("Box Plot by University")
