@@ -20,12 +20,18 @@ theses['grandeDiscipline'] = theses['grandeDiscipline'].str.replace('5. Sciences
 theses['grandeDiscipline'] = theses['grandeDiscipline'].str.replace('6. Sciences humaines', 'Sciences humaines')
 theses['grandeDiscipline'] = theses['grandeDiscipline'].str.replace('7. Programme personnalisé', 'Programme personnalisé')
 
-selected_type = st.sidebar.multiselect("Select type:", ["Maîtrise", "Doctorat"], default=["Doctorat"])
+# Convert both the DataFrame column and the selected_type list to the same case (e.g., lower)
+theses['type_lower'] = theses['type'].str.lower()
+selected_type_lower = [t.lower() for t in selected_type]
+
+# Now, filter using the lowercase column and list
+
+
 selected_grande_discipline = st.sidebar.selectbox("Select a grande discipline:", ["All Disciplines"] + list(theses['grandeDiscipline'].unique()), index=0)
 
 # Define your functions for updating the plots
 def update_box_plot_by_university(selected_type):
-    filtered_df = theses[theses['type'].isin(selected_type)]
+    filtered_df = theses[theses['type_lower'].isin(selected_type_lower)]
     universite_medians = filtered_df.groupby('universite')['nbPages'].median().sort_values(ascending=True)
     base_hue = 240  
     base_saturation = 100
